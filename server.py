@@ -1,31 +1,32 @@
+'''server.py file'''
 from flask import Flask, render_template, request
 from EmotionDetection.emotion_detection import emotion_detector
 
 app = Flask("Emotion Detection")
-@app.route("/emotionDetector")
+
 @app.route("/emotionDetector")
 def sent_analyzer():
+    '''sent_analyzer function'''
     text_to_analyze = request.args.get('textToAnalyze')
 
     response = emotion_detector(text_to_analyze)
 
-    if response is None:
-        return "Invalid input"
-
-    return ("For the given statement, the system response is "
-            "'anger': {}, 'disgust': {}, 'fear': {}, 'joy': {} and "
-            "'sadness': {}. The dominant emotion is {}."
-            ).format(
-                response["anger"],
-                response["disgust"],
-                response["fear"],
-                response["joy"],
-                response["sadness"],
-                response["dominant_emotion"]
-            )
+    #Handle invalid / blank input
+    if response["dominant_emotion"] is None:
+        return "Invalid text! Please try again!"
+    return (
+        f"For the given statement, the system response is "
+        f"'anger': {response['anger']}, "
+        f"'disgust': {response['disgust']}, "
+        f"'fear': {response['fear']}, "
+        f"'joy': {response['joy']} and "
+        f"'sadness': {response['sadness']}. "
+        f"The dominant emotion is {response['dominant_emotion']}."
+    )
 
 @app.route("/")
 def render_index_page():
+    '''render_index_page function'''
     return render_template('index.html')
 
 if __name__ == "__main__":
